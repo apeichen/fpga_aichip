@@ -48,15 +48,28 @@ module xrbus_top (
     logic [31:0] policy_mask;
     logic time_valid, frame_valid, boundary_valid, integrity_valid;
     
+    // ======================================================================
+    // XR-BUS 常數定義
+    // ======================================================================
+    // 追蹤種子值 (128-bit) - 取代 'hxr_trace_seed
+    localparam logic [127:0] XR_TRACE_SEED = 128'h0000_0001_0000_0002_0000_0003_0000_0004;
+    
+    // XENOA 語義哈希值 (32-bit) - 取代 'hxenoa_hash
+    localparam logic [31:0] XENOA_SEMANTIC_HASH = 32'h9e107d9d;
+    
+    // 簽章金鑰 (256-bit) - 取代 'hxr_key
+    localparam logic [255:0] XR_SIGNING_KEY = 256'hDEAD_BEEF_CAFE_BABE_0000_1111_2222_3333_4444_5555_6666_7777_8888_9999_AAAA_BBBB;
+    // ======================================================================
+    
     // 時間戳產生器 (簡化版)
     always_ff @(posedge device_clk) device_time <= device_time + 1;
     always_ff @(posedge fabric_clk) fabric_time <= fabric_time + 1;
     always_ff @(posedge cloud_clk) cloud_time <= cloud_time + 1;
     
-    // 追蹤 ID 產生器 - 使用從 XENOA 語義鍵值取得的 seed
+    // 追蹤 ID 產生器 - 使用 XENOA 語義鍵值
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            trace_id <= 128'h0000_0001_0000_0002_0000_0003_0000_0004;
+            trace_id <= XR_TRACE_SEED;
         end else if (tx_request) begin
             trace_id <= trace_id + 1;
             parent_id <= trace_id;
@@ -91,7 +104,7 @@ module xrbus_top (
         .cloud_time     (cloud_time),
         .trace_id       (trace_id),
         .parent_id      (parent_id),
-        .semantic_hash  (32'h9e107d9d),
+        .semantic_hash  (XENOA_SEMANTIC_HASH),
         .payload        (payload),
         .payload_len    (payload_len),
         .version        (32'd2_0),
@@ -124,7 +137,7 @@ module xrbus_top (
         .min_compatible (8'd1),
         .frame_in       (boundary_tagged),
         .frame_valid    (boundary_valid),
-        .signing_key    (256'h0102_0304_0506_0000_0102_0304_0506_0000_0102_0304_0506_0000_0102_0304_0506_0000),
+        .signing_key    (XR_SIGNING_KEY),
         .frame_version  (),
         .version_compatible(integrity_ok),
         .frame_signature(signature),
