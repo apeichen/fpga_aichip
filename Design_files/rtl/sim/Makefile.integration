@@ -1,0 +1,38 @@
+# XR Integration Makefile
+
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+RTL_DIR = ../rtl
+XSM_DIR = $(RTL_DIR)/xsm
+XENOS_DIR = $(RTL_DIR)/xenos
+INTEG_DIR = $(RTL_DIR)/integration
+VCD_FILE = integration_waveform.vcd
+SIM_OUT = integration_sim
+
+SRCS = \
+	$(XSM_DIR)/xsm_capture_12channel.sv \
+	$(XENOS_DIR)/xenos_top.sv \
+	$(XENOS_DIR)/xenos_boundary.sv \
+	$(XENOS_DIR)/xenos_fsm.sv \
+	$(INTEG_DIR)/xr_core_top.sv
+
+all: compile run test
+
+compile:
+	@echo "Compiling XR Integration..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(SRCS)
+
+run:
+	@echo "Running integration simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python integration tests..."
+	python3 tests/test_xr_integration.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean

@@ -1,0 +1,26 @@
+# XR Series Simple XSM Test Makefile
+
+SIM ?= icarus
+TOPLEVEL_LANG ?= verilog
+
+RTL_DIR = ..
+VERILOG_SOURCES += $(RTL_DIR)/xsm/xsm_capture_simple.sv
+
+TOPLEVEL = xsm_capture_simple
+
+MODULE = tests.test_xsm_simple
+COCOTB_TEST_MODULES = tests.test_xsm_simple
+
+COCOTB_HDL_TIMEUNIT = 1ns
+COCOTB_HDL_TIMEPRECISION = 1ps
+WAVES ?= 0
+PYTHONPATH := $(PWD):$(PYTHONPATH)
+
+include $(shell cocotb-config --makefiles)/Makefile.sim
+
+clean::
+	rm -rf sim_build/
+	rm -f results.xml
+	rm -f *.vcd *.fst *.log
+
+.PHONY: clean

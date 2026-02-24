@@ -1,0 +1,35 @@
+# XENOA Makefile
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+XENOA_DIR = ../xenoa
+VCD_FILE = xenoa_waveform.vcd
+SIM_OUT = xenoa_sim
+
+XENOA_SRCS = \
+	$(XENOA_DIR)/xenoa_semantic.sv \
+	$(XENOA_DIR)/xenoa_temporal.sv \
+	$(XENOA_DIR)/xenoa_boundary_map.sv \
+	$(XENOA_DIR)/xenoa_reasoning.sv \
+	$(XENOA_DIR)/xenoa_top.sv
+
+all: compile run test
+
+compile:
+	@echo "Compiling XENOA..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XENOA_SRCS)
+	@echo "Compilation complete!"
+
+run:
+	@echo "Running XENOA simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python tests..."
+	python3 tests/xenoa/test_xenoa.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean

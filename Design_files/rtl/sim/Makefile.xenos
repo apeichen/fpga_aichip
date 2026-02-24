@@ -1,0 +1,29 @@
+# XENOS Makefile
+
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+RTL_DIR = ../rtl
+XENOS_DIR = $(RTL_DIR)/xenos
+VCD_FILE = xenos_waveform.vcd
+SIM_OUT = xenos_sim
+
+XENOS_SRCS = \
+	$(XENOS_DIR)/xenos_top.sv \
+	$(XENOS_DIR)/xenos_boundary.sv \
+	$(XENOS_DIR)/xenos_fsm.sv
+
+all: compile run
+
+compile:
+	@echo "Compiling XENOS..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XENOS_SRCS)
+
+run:
+	@echo "Running XENOS simulation..."
+	$(VVP) $(SIM_OUT)
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd
+
+.PHONY: all compile run clean

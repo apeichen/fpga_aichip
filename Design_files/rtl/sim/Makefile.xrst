@@ -1,0 +1,35 @@
+# XRST Makefile
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+XRST_DIR = ../xrst
+VCD_FILE = xrst_waveform.vcd
+SIM_OUT = xrst_sim
+
+XRST_SRCS = \
+	$(XRST_DIR)/xrst_evidence_intake.sv \
+	$(XRST_DIR)/xrst_tokenization_engine.sv \
+	$(XRST_DIR)/xrst_smart_sla.sv \
+	$(XRST_DIR)/xrst_regulated_settlement.sv \
+	$(XRST_DIR)/xrst_top.sv
+
+all: compile run test
+
+compile:
+	@echo "Compiling XRST..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XRST_SRCS)
+	@echo "Compilation complete!"
+
+run:
+	@echo "Running XRST simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python tests..."
+	python3 tests/xrst/test_xrst.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean

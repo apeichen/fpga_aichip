@@ -1,0 +1,35 @@
+# XRAS Makefile
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+XRAS_DIR = ../xras
+VCD_FILE = xras_waveform.vcd
+SIM_OUT = xras_sim
+
+XRAS_SRCS = \
+	$(XRAS_DIR)/xras_sla_orchestration.sv \
+	$(XRAS_DIR)/xras_policy_execution.sv \
+	$(XRAS_DIR)/xras_reliability_scoring.sv \
+	$(XRAS_DIR)/xras_settlement_integration.sv \
+	$(XRAS_DIR)/xras_top.sv
+
+all: compile run test
+
+compile:
+	@echo "Compiling XRAS..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XRAS_SRCS)
+	@echo "Compilation complete!"
+
+run:
+	@echo "Running XRAS simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python tests..."
+	python3 tests/xras/test_xras.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean

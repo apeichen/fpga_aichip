@@ -1,0 +1,35 @@
+# XREK Makefile
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+XREK_DIR = ../xrek
+VCD_FILE = xrek_waveform.vcd
+SIM_OUT = xrek_sim
+
+XREK_SRCS = \
+	$(XREK_DIR)/xrek_action_contract.sv \
+	$(XREK_DIR)/xrek_capability_registry.sv \
+	$(XREK_DIR)/xrek_orchestration.sv \
+	$(XREK_DIR)/xrek_verification.sv \
+	$(XREK_DIR)/xrek_top.sv
+
+all: compile run test
+
+compile:
+	@echo "Compiling XREK..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XREK_SRCS)
+	@echo "Compilation complete!"
+
+run:
+	@echo "Running XREK simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python tests..."
+	python3 tests/xrek/test_xrek.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean

@@ -1,0 +1,37 @@
+# XROG Makefile
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+XROG_DIR = ../xrog
+VCD_FILE = xrog_waveform.vcd
+SIM_OUT = xrog_sim
+
+XROG_SRCS = \
+	$(XROG_DIR)/xrog_orbit_definition.sv \
+	$(XROG_DIR)/xrog_orbit_stability.sv \
+	$(XROG_DIR)/xrog_cross_orbit_interaction.sv \
+	$(XROG_DIR)/xrog_policy_governor.sv \
+	$(XROG_DIR)/xrog_policy_enforcer.sv \
+	$(XROG_DIR)/xrog_treaty_manager.sv \
+	$(XROG_DIR)/xrog_top.sv
+
+all: compile run test
+
+compile:
+	@echo "Compiling XROG..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XROG_SRCS)
+	@echo "Compilation complete!"
+
+run:
+	@echo "Running XROG simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python tests..."
+	python3 tests/xrog/test_xrog.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean

@@ -1,0 +1,34 @@
+# XAPS Makefile
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+XAPS_DIR = ../xaps
+VCD_FILE = xaps_waveform.vcd
+SIM_OUT = xaps_sim
+
+XAPS_SRCS = \
+	$(XAPS_DIR)/xaps_api_core.sv \
+	$(XAPS_DIR)/xaps_solution_templates.sv \
+	$(XAPS_DIR)/xaps_application_layer.sv \
+	$(XAPS_DIR)/xaps_top.sv
+
+all: compile run test
+
+compile:
+	@echo "Compiling XAPS..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XAPS_SRCS)
+	@echo "Compilation complete!"
+
+run:
+	@echo "Running XAPS simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python tests..."
+	python3 tests/xaps/test_xaps.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean

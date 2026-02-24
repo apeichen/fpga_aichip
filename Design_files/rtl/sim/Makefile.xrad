@@ -1,0 +1,34 @@
+# XRAD Makefile
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+XRAD_DIR = ../xrad
+VCD_FILE = xrad_waveform.vcd
+SIM_OUT = xrad_sim
+
+XRAD_SRCS = \
+	$(XRAD_DIR)/xrad_top.sv \
+	$(XRAD_DIR)/xrad_ai_accelerator.sv \
+	$(XRAD_DIR)/xrad_rt_processor.sv \
+	$(XRAD_DIR)/xrad_mac_unit.sv
+
+all: compile run
+
+compile:
+	@echo "Compiling XRAD..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XRAD_SRCS)
+	@echo "Compilation complete!"
+
+run:
+	@echo "Running simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python tests..."
+	python3 tests/xrad/test_xrad.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean

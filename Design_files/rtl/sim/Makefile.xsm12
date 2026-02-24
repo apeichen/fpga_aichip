@@ -1,0 +1,26 @@
+# XSM 12通道 Makefile
+
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+RTL_DIR = ../rtl
+XSM_DIR = $(RTL_DIR)/xsm
+VCD_FILE = xsm_waveform.vcd
+SIM_OUT = xsm_sim
+
+XSM_SRCS = $(XSM_DIR)/xsm_capture_12channel.sv
+
+all: compile run
+
+compile:
+	@echo "Compiling XSM 12-channel..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XSM_SRCS)
+
+run:
+	@echo "Running XSM simulation..."
+	$(VVP) $(SIM_OUT)
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd
+
+.PHONY: all compile run clean

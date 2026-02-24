@@ -1,0 +1,35 @@
+# XR-BUS Makefile
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+XR_BUS_DIR = ../xrbus
+VCD_FILE = xrbus_waveform.vcd
+SIM_OUT = xrbus_sim
+
+XR_BUS_SRCS = \
+	$(XR_BUS_DIR)/xrbus_frame.sv \
+	$(XR_BUS_DIR)/xrbus_timing.sv \
+	$(XR_BUS_DIR)/xrbus_boundary.sv \
+	$(XR_BUS_DIR)/xrbus_integrity.sv \
+	$(XR_BUS_DIR)/xrbus_top.sv
+
+all: compile run test
+
+compile:
+	@echo "Compiling XR-BUS..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XR_BUS_SRCS)
+	@echo "Compilation complete!"
+
+run:
+	@echo "Running XR-BUS simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python tests..."
+	python3 tests/xrbus/test_xrbus.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean

@@ -1,0 +1,38 @@
+# XSIP Makefile
+SIMULATOR = iverilog
+SIM_FLAGS = -g2012 -Wall
+VVP = vvp
+XSIP_DIR = ../xsip
+VCD_FILE = xsip_waveform.vcd
+SIM_OUT = xsip_sim
+
+XSIP_SRCS = \
+	$(XSIP_DIR)/xsip_telemetry_ic.sv \
+	$(XSIP_DIR)/xsip_telemetry_board.sv \
+	$(XSIP_DIR)/xsip_telemetry_aggregator.sv \
+	$(XSIP_DIR)/xsip_control_ec.sv \
+	$(XSIP_DIR)/xsip_control_power.sv \
+	$(XSIP_DIR)/xsip_control_debug.sv \
+	$(XSIP_DIR)/xsip_activation.sv \
+	$(XSIP_DIR)/xsip_top.sv
+
+all: compile run test
+
+compile:
+	@echo "Compiling XSIP..."
+	$(SIMULATOR) $(SIM_FLAGS) -o $(SIM_OUT) $(XSIP_SRCS)
+	@echo "Compilation complete!"
+
+run:
+	@echo "Running XSIP simulation..."
+	$(VVP) $(SIM_OUT)
+
+test:
+	@echo "Running Python tests..."
+	python3 tests/xsip/test_xsip.py
+
+clean:
+	rm -f $(SIM_OUT) $(VCD_FILE) *.vcd *.pyc
+	rm -rf __pycache__
+
+.PHONY: all compile run test clean
